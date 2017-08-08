@@ -1,5 +1,3 @@
-//#include <ICMPPing.h>
-
 /* Control Arduino Ethernet
  
  controla el encendido o apagado de los Pin 2,3,4 ,5 y 6 del Arduino. (Me falta comprobar que los 7,8 y 9 los puedo usar)
@@ -10,24 +8,14 @@
 #include <Ethernet.h>
 
 
-int cambio = 0; 
-//byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };   //Direccion Fisica MAC
-byte mac[] = {0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x02};  
-
- byte ip[] = { 132, 248, 174, 76 };                       // IP para funcionar en oficina 
- byte gateway[] = { 132, 248, 174, 254 };                   // Puerta de enlace
- byte subnet[] = { 255, 255, 255, 0 };                  //Mascara de Sub Red
-//byte pingAddr[] = {132,248,174,76}; // ip address to ping
-//byte ip[] = { 192, 168, 1, 13 };                       // IP Local que usted debe configurar 
-//byte gateway[] = { 192, 168, 1, 254 };                   // Puerta de enlace
-//byte subnet[] = { 255, 255, 255, 0 };                  //Mascara de Sub Red
-
-//SOCKET pingSocket = 3;
-
-//char buffer [128];
+//Direccion Fisica MAC
+//byte mac[] = {0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x02};
+byte mac[] = {
+  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED  
+ };
 
 
-EthernetServer server(8000);                             //Se usa el puerto 80 del servidor     
+EthernetServer server(80);                             //Se usa el puerto 80 del servidor     
 String readString;
 
 void setup() {
@@ -37,11 +25,8 @@ void setup() {
 //    ; 
 //  }
 
-
-
-
-  
-  pinMode(2,OUTPUT);        // Se configura como salidas los puertos del 2 al 6
+// Se configura como salidas los puertos del 2 al 9
+  pinMode(2,OUTPUT);        
   pinMode(3,OUTPUT);
   pinMode(4, OUTPUT);
   pinMode(5,OUTPUT);
@@ -50,7 +35,9 @@ void setup() {
   pinMode(8,OUTPUT);
   pinMode(9,OUTPUT);
 
-  digitalWrite(2, HIGH); // Por dafault prendo los pin para que se apaguen focos
+// Por default prendo los pin para que se apaguen focos
+// tengo que probar digitalWrite(2,Relay_ON);
+  digitalWrite(2, HIGH); 
   digitalWrite(3, HIGH);
   digitalWrite(4, HIGH);
   digitalWrite(5, HIGH);
@@ -61,8 +48,8 @@ void setup() {
  
  
 //  Ethernet.begin(mac, ip, gateway, subnet); // Inicializa la conexion Ethernet y el servidor
-  Ethernet.begin(mac, ip, gateway, subnet);
-//  Ethernet.maintain();
+  Ethernet.begin(mac);
+  Ethernet.maintain();
   server.begin();
   Serial.print("El Servidor es: ");
   Serial.println(Ethernet.localIP());    // Imprime la direccion IP Local
@@ -72,140 +59,95 @@ void setup() {
 void loop() {
   // Crea una conexion Cliente
   EthernetClient client = server.available();
-  if (client==true) {
+  if (client) {
+    Serial.println("Un nuevo cliente conectado");
     while (client.connected()) {   
       if (client.available()) {
         char c = client.read();
+        
+        Serial.write(c);
      
         //Lee caracter por caracter HTTP
         if (readString.length() < 100) {
           //Almacena los caracteres a un String
-          readString += c;
+        readString += c;
           
-         }
+        }
 
          // si el requerimiento HTTP fue finalizado
         if (c == '\n') {          
            Serial.println(readString); //Imprime en el monitor serial (recomendación encontrada)
-     
+           
            client.println("HTTP/1.1 200 OK");           //envia una nueva pagina en codigo HTML
            client.println("Content-Type: text/html");
-           client.println();     
+//           client.println("Connection: close");  // the connection will be closed after completion of the response
+//          client.println("Refresh: 5");  // refresh the page automatically every 5 sec
+           client.println();
+           client.println("<!DOCTYPE HTML>");
            client.println("<HTML>");
            client.println("<HEAD>");
-           client.println("<STYLE>");
-          client.println(F("p {font-family:verdana;text-align:center;outline: hotpink dotted thick;}"));
+           client.println(F("<STYLE>")); //uso la función F() para que las variables strings sean almacenadas en la memoria flash
+           client.println(F("p {font-family:verdana;text-align:center;outline: hotpink dotted thick;}"));
            client.println(F("a:link, a:visited {background-color:cornflowerblue;color:white;padding:14px 25px;text-align:center;"));
-         client.println(F("text-decoration: none; display: inline-block; border: 2px solid cornflowerblue; font-family:verdana; font-size:30px;position: relative; left: 300px;}"));
-       client.println(F("a:hover, a:active { background-color: white; color: gray;}"));
-           client.println("</STYLE>");
-           client.println("<TITLE>Controlar de luces de Winterfell</TITLE>");
+           client.println(F("text-decoration: none; display: inline-block; border: 2px solid cornflowerblue; font-family:verdana; font-size:30px;position: relative; left: 300px;}"));
+           client.println(F("a:hover, a:active { background-color: white; color: gray;}"));
+           client.println(F("</STYLE>"));
+           client.println(F("<TITLE>Controlar de luces de Winterfell</TITLE>"));
            client.println("</HEAD>");
            client.println("<BODY>");
-           client.println(F("<p><b>Control de Luces</b></p>"));
+           client.println(F("<p><b>Control de luces de Winterfell</b></p>"));
            
 
-          
-        
          //control del arduino si un boton es presionado
                    
            if (readString.indexOf("?button2on") >0){
                digitalWrite(2, HIGH);
-            client.flush();
-            }
+           //    client.println(F("<a href=\"/?button2off\"\"> ON1&nbsp; Rec&aacute;mara &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2)</a><br /><br /> "));   
+    
+              // client.flush();
+              
+              
+           }
            if (readString.indexOf("?button2off") >0){
                digitalWrite(2, LOW);
-            client.flush();
-          
-           }
-           
-             if (readString.indexOf("?button3on") >0){
-               digitalWrite(3, HIGH);
-            client.flush();
-            }
-           if (readString.indexOf("?button3off") >0){
-               digitalWrite(3, LOW);
-            client.flush();
-          
-           }
+             //   client.println(F("<a style='background-color:white;color:gray;'  href=\"/?button2on\"\"> OFF1 Rec&aacute;mara &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2)</a><br /><br /> "));   
 
-           if (readString.indexOf("?button4on") >0){
-               digitalWrite(4, HIGH);
-            client.flush();
-            }
-           if (readString.indexOf("?button4off") >0){
-               digitalWrite(4, LOW);
-            client.flush();
+              // client.flush();
+              
            }
-
-           if (readString.indexOf("?button5on") >0){
-               digitalWrite(5, HIGH);
-            client.flush();
-            }
-           if (readString.indexOf("?button5off") >0){
-               digitalWrite(5, LOW);
-            client.flush();
-           }
-            
             // Limpia el String para una nueva lectura
-            readString=""; 
-            
-           
-                       
+           readString=""; 
            
           
            if (digitalRead(2)==1){
               client.println(F("<a href=\"/?button2off\"\"> ON&nbsp; Rec&aacute;mara &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2)</a><br /><br /> "));   
+              
            }
            else {
               client.println(F("<a style='background-color:white;color:gray;'  href=\"/?button2on\"\"> OFF Rec&aacute;mara &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2)</a><br /><br /> "));   
            }
 
-          
-           if (digitalRead(3)==1){
-              client.println(F("<a href=\"/?button3off\"\"> ON&nbsp; Jard&iacute;n central&nbsp;&nbsp;&nbsp; (3)</a><br /><br /> "));   
-           }
-           else {
-              client.println(F("<a style='background-color:white;color:gray;' href=\"/?button3on\"\"> OFF Jard&iacute;n central &nbsp;&nbsp;&nbsp;(3)</a><br /><br /> "));   
-           }
-
-          
-           if (digitalRead(4)==1){
-              client.println(F("<a href=\"/?button4off\"\"> ON&nbsp; Jard&iacute;n derecho&nbsp; (4)</a><br /><br /> "));   
-           }
-           else {
-              client.println(F("<a style='background-color:white;color:gray;' href=\"/?button4on\"\"> OFF Jard&iacute;n derecho&nbsp;&nbsp;(4)</a><br /><br /> "));   
-           }
-
-           
-           if (digitalRead(5)==1){
-              client.println(F("<a href=\"/?button5off\"\"> ON&nbsp; Jard&iacute;n izquierdo (5)</a><br /><br /> "));   
-           }
-           else {
-              client.println(F("<a style='background-color:white;color:gray;' href=\"/?button5on\"\"> OFF Jard&iacute;n izquierdo (5)</a><br /><br /> "));   
-           }
-           
-
-// ICMPPing ping(pingSocket);
-//  ping(4, pingAddr, buffer);
-//  Serial.println(buffer);
-
                      
-           client.println(F("<p>Por Rubencio Pipluto</p>")); 
+           client.println("<p>Por Rubencio para Pinky</p>"); 
            client.println("</BODY>");
            client.println("</HTML>");
-     
+           
+ //          break;   
            delay(1);
-           //detiene el cliente servidor
+//           detiene el cliente servidor
            client.stop();
            
+//           Serial.println("Dentro del c==n");
   
        
          }
+//         Serial.println("Salgo del c==n y esto en el client available  ");
+         
        }
+//       Serial.println("Salgo del client available y estoy en client connected");
     }
-//     ICMPPing ping(pingSocket);
-//  ping(4, pingAddr, buffer);
-//  Serial.println(buffer);
-}
+ //   delay(1);
+ //   client.stop();
+ //   Serial.println("Cliente desconectado");
+  }
 }
