@@ -1,4 +1,4 @@
-/* Control Arduino Ethernet
+/* Control Arduino Ethernet 1.7.1
  
  controla el encendido o apagado de los Pin 2,3,4 ,5 y 6 del Arduino. (Me falta comprobar que los 7,8 y 9 los puedo usar)
  
