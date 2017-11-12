@@ -1,11 +1,11 @@
 # arduino_luces_1_9_3
-Arduino control de luces por Internet 
+Arduino control de luces por Internet. 
 Items:
-1 Arduino UNO $200
-1 Arduino Ethernet Shield W5100 $200
-2 modulos relevadores para 4 canales electromecánicos $100 x 2 (recomiendo usar de estado sólido porque me empiezan a dar lata)
-1 pulsador $1
-1 protoboard $30
+1 Arduino UNO $200.
+1 Arduino Ethernet Shield W5100 $200.
+2 modulos relevadores para 4 canales electromecánicos $100 x 2 (recomiendo usar de estado sólido porque me empiezan a dar lata).
+1 pulsador $1.
+1 protoboard $30.
 
 Descripción:
  Control, a través de Internet, el encendido y apagado de los Pines 2, 3, 5 y 6 conectados al módulo relé A; y 7 conectado al módulo relé B del Arduino UNO con Ethernet Shield.
