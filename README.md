@@ -6,6 +6,7 @@ Items:
 2 modulos relevadores para 4 canales electromecánicos $100 x 2 (recomiendo usar de estado sólido porque me empiezan a dar lata).
 1 pulsador $1.
 1 protoboard $30.
+Resistencias de diferentes omhs (conectar leds sin resistencias puede ocasionar que quemen el Arduino). 
 
 Descripción:
  Control, a través de Internet, el encendido y apagado de los Pines 2, 3, 5 y 6 conectados al módulo relé A; y 7 conectado al módulo relé B del Arduino UNO con Ethernet Shield.
